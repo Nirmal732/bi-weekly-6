@@ -1,0 +1,97 @@
+using System;
+using System.Collections.Generic;
+
+namespace TigerSoccerClub
+{
+    // Player class to store player details
+    public class Player
+    {
+        public string Name { get; set; }
+        public string Registration { get; set; }
+        public bool WantsJersey { get; set; }
+        public double Price { get; set; }
+
+        public Player(string name, string registration, bool wantsJersey)
+        {
+            Name = name;
+            Registration = registration;
+            WantsJersey = wantsJersey;
+            Price = 0; // Will be calculated later
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.Clear();
+            string heading = "***** Welcome to TigerSoccerClub *****";
+            Console.SetCursorPosition((Console.WindowWidth - heading.Length) / 2, Console.CursorTop);
+            Console.WriteLine(heading);
+            Console.WriteLine();
+
+            Console.Write("Enter the number of players per registration (1-4): ");
+            int numberOfPlayers = Convert.ToInt32(Console.ReadLine());
+
+            if (numberOfPlayers < 1 || numberOfPlayers > 4)
+            {
+                Console.WriteLine("Invalid number. Please enter a value between 1 and 4.");
+                return;
+            }
+
+            List<Player> playersList = new List<Player>();
+
+            // Collect player information
+            for (int i = 0; i < numberOfPlayers; i++)
+            {
+                Console.WriteLine($"\n--- Enter details for Player {i + 1} ---");
+
+                Console.Write("Enter name: ");
+                string name = Console.ReadLine();
+
+                Console.Write("Enter registration type (Kids/Adult): ");
+                string registration = Console.ReadLine();
+
+                Console.Write("Do you want a jersey? (Yes/No): ");
+                bool wantsJersey = Console.ReadLine().Trim().ToLower() == "yes";
+
+                Player player = new Player(name, registration, wantsJersey);
+                player.Price = CalculatePrice(registration, wantsJersey, numberOfPlayers);
+                playersList.Add(player);
+
+                Console.WriteLine($"Total price for {name} is: ${player.Price:F2}\n");
+            }
+
+            // Display summary
+            DisplaySummary(playersList);
+        }
+
+        // Function to calculate the total price for a player
+        public static double CalculatePrice(string registrationType, bool wantsJersey, int playerCount)
+        {
+            double basePrice = registrationType.ToLower() == "kids" ? 150 : 230;
+            if (wantsJersey) basePrice += 100;
+
+            // Apply 5% discount if 2 to 4 players
+            if (playerCount >= 2 && playerCount <= 4)
+                basePrice *= 0.95;
+
+            return basePrice;
+        }
+
+        // Function to display a summary of all registrations
+        public static void DisplaySummary(List<Player> players)
+        {
+            Console.WriteLine("\n***** Summary of Registrations *****");
+            Console.WriteLine("*********************************************");
+            Console.WriteLine("Name\tType\tJersey\tTotal");
+
+            foreach (var p in players)
+            {
+                Console.WriteLine($"{p.Name}\t{p.Registration}\t{(p.WantsJersey ? "Yes" : "No")}\t${p.Price:F2}");
+            }
+
+            Console.WriteLine("*********************************************");
+        }
+    }
+}
